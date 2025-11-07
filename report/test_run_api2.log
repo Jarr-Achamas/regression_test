@@ -1,0 +1,24 @@
+INFO     conftest:conftest.py:45 --- Fixture Setup: Starting new test in a clean browser state ---
+INFO     conftest:conftest.py:53 Fixture: Login successful as pornnutcha@evolany.com.
+INFO     conftest:conftest.py:58 Fixture: Navigation to bot 'Jarr_regression_2509_API2' complete. Page is ready for the test.
+INFO     test_admin_bot:test_admin_bot.py:19 --- Starting test: Check and Clear previous created data ---
+INFO     test_admin_bot:test_admin_bot.py:41 Test PASSED: [1] Chatflow page loaded successfully.
+INFO     test_admin_bot:test_admin_bot.py:41 Test PASSED: [2] Check and Clear all previous created Groups Chatflow data.
+INFO     test_admin_bot:test_admin_bot.py:41 Test PASSED: [3] Check and Clear all previous created Coupons data.
+INFO     test_admin_bot:test_admin_bot.py:41 Test PASSED: [4] Check and Clear all previous created Segment data.
+INFO     conftest:conftest.py:65 --- Fixture Teardown: Test finished ---
+INFO     conftest:conftest.py:45 --- Fixture Setup: Starting new test in a clean browser state ---
+INFO     conftest:conftest.py:53 Fixture: Login successful as pornnutcha@evolany.com.
+INFO     conftest:conftest.py:58 Fixture: Navigation to bot 'Jarr_regression_2509_API2' complete. Page is ready for the test.
+INFO     test_admin_bot:test_admin_bot.py:268 --- Starting test: Test creating a new 画像＆動画 flow and all related reaction. ---
+INFO     test_admin_bot:test_admin_bot.py:295 Test PASSED: [1] Created a new Group4.
+INFO     test_admin_bot:test_admin_bot.py:295 Test PASSED: [2] Created new 画像＆動画 items.
+INFO     test_admin_bot:test_admin_bot.py:295 Test PASSED: [3] Set reaction for Image item.
+ERROR    test_admin_bot:test_admin_bot.py:297 Test FAILED: [4] FAILED to set reaction for Video item.
+ERROR    test_admin_bot:test_admin_bot.py:298 --- Playwright Error Details ---
+Timeout 30000ms exceeded while waiting for event "response"
+=========================== logs ===========================
+waiting for response **/api/bot/action
+============================================================
+-------------------------------
+INFO     conftest:conftest.py:65 --- Fixture Teardown: Test finished ---
