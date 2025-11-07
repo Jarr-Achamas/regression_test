@@ -1,0 +1,90 @@
+flowchart TD
+    %% Entry Points
+    Start[User Runs Make Command] --> MakeChoice{Make Command Type}
+    MakeChoice -->|API 1.0 Headless| API1[make test_web_API1.0]
+    MakeChoice -->|API 1.0 Headed| API1H[make test_web_API1.0_headed]
+    MakeChoice -->|API 2.0 Headless| API2[make test_web_API2.0]
+    MakeChoice -->|API 2.0 Headed| API2H[make test_web_API2.0_headed]
+    
+    API1 --> Pytest[pytest Runner]
+    API1H --> Pytest
+    API2 --> Pytest
+    API2H --> Pytest
+    
+    Pytest --> PytestConfig[pytest.ini<br/>testpaths = tests]
+    
+    %% Configuration Layer
+    subgraph Config["Configuration Layer"]
+        PytestConfig --> ConfigFile[config.py<br/>Loads .env<br/>BOT_NAMES dict]
+        ConfigFile --> TestData[test_data.py<br/>Test constants<br/>Image mappings]
+    end
+    
+    %% Fixture Setup
+    subgraph Fixtures["Fixture Setup"]
+        TestData --> Conftest[conftest.py]
+        Conftest --> SessionFixtures[Session Fixtures<br/>Run once per session]
+        SessionFixtures --> ApiVersion[api_version fixture]
+        SessionFixtures --> BotName[bot_name fixture]
+        SessionFixtures --> ProjectRoot[project_root fixture]
+        SessionFixtures --> ImageFactory[image_path_factory fixture]
+        
+        ApiVersion --> FuncFixture[logged_in_chatflow_page<br/>Function-scoped<br/>Runs per test]
+        BotName --> FuncFixture
+        FuncFixture --> LoginPO[LoginPage<br/>Navigate and Login]
+        LoginPO --> BotListPO[BotListViewPage<br/>Search and Select Bot]
+        BotListPO --> ReadyPage[Page Ready]
+    end
+    
+    %% Test Execution
+    subgraph Tests["Test Execution - test_admin_bot.py<br/>6 Test Cases"]
+        ReadyPage --> Test1[Test 1: test_clear_previous_created_data<br/>Cleanup previous test data]
+        Test1 --> Test2[Test 2: test_chatflow_kaiwa<br/>Create 会話 flow]
+        Test2 --> Test3[Test 3: test_coupon_function<br/>Coupon CRUD operations]
+        Test3 --> Test4[Test 4: test_chatflow_carousel<br/>Create カルーセル flow]
+        Test4 --> Test5[Test 5: test_chatflow_image_carousel_map<br/>Create イメージカルーセル and イメージマップ]
+        Test5 --> Test6[Test 6: test_chatflow_image_video<br/>Create 画像動画 flow]
+    end
+    
+    %% Page Objects
+    subgraph PageObjects["Page Object Model - 9 Classes"]
+        Test1 --> PO1[CheckClearData]
+        Test1 --> POBase1[ChatflowPage]
+        Test2 --> PO2[CreateChat]
+        Test3 --> PO3[CouponFunction]
+        Test4 --> PO4[CreateCarousel]
+        Test4 --> POBase2[ChatflowPage]
+        Test5 --> PO5[CreateImageCarouselMap]
+        Test6 --> PO6[CreateImageVideo]
+    end
+    
+    %% Test Data
+    subgraph Data["Test Data"]
+        ImageFactory --> UploadData[uploaddata/<br/>coupon_img.png<br/>image_map.jpg<br/>image1.jpg<br/>video1.mp4]
+        UploadData -.->|Used by| Test3
+        UploadData -.->|Used by| Test5
+        UploadData -.->|Used by| Test6
+    end
+    
+    %% Reporting
+    subgraph Reports["Reporting"]
+        Test6 --> Report[Generate Reports]
+        Report --> HTMLReport[report/report_api.html<br/>HTML Test Report]
+        Report --> LogReport[report/test_run_api.log<br/>Detailed Log File]
+    end
+    
+    %% Styling - Dark Theme Optimized
+    classDef entryPoint fill:#1565c0,stroke:#64b5f6,stroke-width:3px,color:#fff
+    classDef config fill:#e65100,stroke:#ffb74d,stroke-width:2px,color:#fff
+    classDef fixture fill:#6a1b9a,stroke:#ba68c8,stroke-width:2px,color:#fff
+    classDef test fill:#2e7d32,stroke:#81c784,stroke-width:2px,color:#fff
+    classDef pageObject fill:#c2185b,stroke:#f48fb1,stroke-width:2px,color:#fff
+    classDef data fill:#f57c00,stroke:#ffb74d,stroke-width:2px,color:#fff
+    classDef report fill:#00695c,stroke:#4db6ac,stroke-width:2px,color:#fff
+    
+    class Start,MakeChoice,API1,API1H,API2,API2H,Pytest entryPoint
+    class PytestConfig,ConfigFile,TestData config
+    class Conftest,SessionFixtures,ApiVersion,BotName,ProjectRoot,ImageFactory,FuncFixture,LoginPO,BotListPO,ReadyPage fixture
+    class Test1,Test2,Test3,Test4,Test5,Test6 test
+    class PO1,PO2,PO3,PO4,PO5,PO6,POBase1,POBase2 pageObject
+    class UploadData data
+    class Report,HTMLReport,LogReport report
