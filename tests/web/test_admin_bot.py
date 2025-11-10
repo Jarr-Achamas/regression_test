@@ -12,6 +12,7 @@ from page_objects import (
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+@pytest.mark.setup
 def test_clear_previous_created_data(logged_in_chatflow_page: Page):
     """
     Check and clear created data test before start run the test.
@@ -49,6 +50,7 @@ def test_clear_previous_created_data(logged_in_chatflow_page: Page):
             raise # IMPORTANT: Always re-raise the exception
 
 
+@pytest.mark.chatflow
 def test_chatflow_kaiwa(logged_in_chatflow_page: Page):
     """
     Test creating a new 会話 flow and all related reaction.
@@ -98,6 +100,7 @@ def test_chatflow_kaiwa(logged_in_chatflow_page: Page):
             logger.error(f"--- Unexpected Error Details ---\n{e}\n---------------------------------")
             raise # IMPORTANT: Always re-raise the exception
 
+@pytest.mark.coupon
 def test_coupon_function(logged_in_chatflow_page: Page, image_path_factory: Callable[..., str]):
     """
     Verify the Coupon page functionality.
@@ -156,6 +159,8 @@ def test_coupon_function(logged_in_chatflow_page: Page, image_path_factory: Call
             logger.error(f"--- Unexpected Error Details ---\n{e}\n---------------------------------")
             raise  # IMPORTANT: Always re-raise the exception
 
+@pytest.mark.chatflow
+@pytest.mark.carousel
 def test_chatflow_carousel(logged_in_chatflow_page: Page):
     """
     Test creating a new カルーセル flow and all related reaction.
@@ -204,6 +209,8 @@ def test_chatflow_carousel(logged_in_chatflow_page: Page):
             logger.error(f"--- Unexpected Error Details ---\n{e}\n---------------------------------")
             raise  # IMPORTANT: Always re-raise the exception
 
+@pytest.mark.chatflow
+@pytest.mark.image_carousel_map
 def test_chatflow_image_carousel_map(logged_in_chatflow_page: Page, image_path_factory: Callable[..., str]):
     """
     Test creating a new イメージカルーセル flow and イメージマップ flow and all related reaction.
@@ -257,6 +264,8 @@ def test_chatflow_image_carousel_map(logged_in_chatflow_page: Page, image_path_f
             raise  # IMPORTANT: Always re-raise the exception
 
 
+@pytest.mark.chatflow
+@pytest.mark.image_video
 def test_chatflow_image_video(logged_in_chatflow_page: Page, image_path_factory: Callable[..., str]):
     """
     Test creating a new 画像＆動画 flow and all related reaction.
