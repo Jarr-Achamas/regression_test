@@ -1,5 +1,5 @@
 # page_objects/chatflow_create_carousel.py
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, Locator, expect
 from tests.web.utils.network_helpers import deploy_and_wait_for_response
 from config import WAITING_TIMEOUT_MS
 from tests.web.test_data import (
@@ -71,6 +71,17 @@ class CreateCarousel:
         expect(self.tutorials_popup).to_be_visible(timeout=WAITING_TIMEOUT_MS)
         self.close_popup_button.click()
         expect(self.tutorials_popup).to_be_hidden(timeout=WAITING_TIMEOUT_MS)
+    
+    # --- Reusable Helper Methods for Waiting for API response when input API content and press enter ---
+    def _wait_for_api_response_after_enter(self, url_glob: str, action_locator: Locator):
+        """Helper to wait for API response after pressing Enter."""
+        with self.page.expect_response(url_glob, timeout=WAITING_TIMEOUT_MS * 2) as response_info:
+            action_locator.press("Enter")
+        response = response_info.value
+        if not response.ok:
+            raise AssertionError(f"Carousel content import API failed with status {response.status}: {response.text()}")  
+        # Assert that the API call was successful
+        assert response.ok, f"API call to {url_glob} failed with status: {response.status}"
 
     # ==================================================================
     # Verification start
@@ -125,7 +136,8 @@ class CreateCarousel:
         # Setting API data source for carousel item
         self.card_src_select.nth(0).get_by_text("API").click()
         self.react_api_input.nth(0).fill(REACTION_CAROUSEL1_API)
-        self.react_api_input.nth(0).press("Enter")
+        # Wait for the API response after pressing Enter
+        self._wait_for_api_response_after_enter("**/api/bot/action", self.react_api_input.nth(0))
         # Verify carousel items are displayed
         list_count = self._get_carousel_count()
         assert list_count > 2

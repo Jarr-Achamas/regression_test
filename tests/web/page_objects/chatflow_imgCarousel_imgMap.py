@@ -3,7 +3,7 @@ from playwright.sync_api import Page, expect, Locator
 from tests.web.utils.network_helpers import deploy_and_wait_for_response
 from config import WAITING_TIMEOUT_MS
 from tests.web.test_data import (
-    GROUP_NAME_IMAGECAROUSEL, IMAGE_CAROUSEL_NAME, IMAGE_MAP_NAME, REACTION_CAROUSEL1_API, 
+    GROUP_NAME_IMAGECAROUSEL, IMAGE_CAROUSEL_NAME, IMAGE_MAP_NAME, 
     REACTION_IMGCAROUSEL_API, REACTION_IMGCAROUSEL_BTN_NAME, 
     GROUP_NAME_KAIWA, CHAT_FLOW_TEXT_ITEMS, GROUP_NAME_CAROUSEL, CHAT_FLOW_CAROUSEL_NAME,
     APP_JSON_DEPLOY_API
