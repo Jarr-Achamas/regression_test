@@ -38,6 +38,9 @@ class CreateImageVideo:
         self.video_item_upload_url = self.react_content_cards.nth(2).locator("i[class='icon link large upload-btn']")
         self.video_item_url_input = self.react_content_cards.nth(2).get_by_placeholder("MP4動画のURL入力")
         self.video_tumbnail_upload_icon2 = self.react_content_cards.nth(2).locator("i[class='icon camera large upload-btn left_t']")
+        # For textitem for verification
+        self.add_kaiwa_text = page.locator("dd[rt='text']")
+        self.kaiwa_text_msg = page.locator("textarea.msg.with-emoticon")
         # Deploy button and popups
         self.deploy_button = page.get_by_role("button", name="公開する")
         self.deploy_popup = page.locator(".popup:has-text('[公開]すると、以下のfacebook page、またはLINEアカウントに反映されます。')")
@@ -177,6 +180,23 @@ class CreateImageVideo:
         # Upload thumbnail image for video item
         self._upload_image_item("image", image_path=image_path, upload_locator=self.video_tumbnail_upload_icon2)
 
+    # --- Test create new text item for verification ---
+    def create_new_textitem_for_verification(self):
+        """Creates a new text item for verification purpose."""
+        # Create Textitem2 under Group3
+        self.add_kaiwa_button.hover()
+        self.add_kaiwa_text.click()
+        expect(self.new_name_textbox).to_be_editable()
+        self.new_name_textbox.fill("Video2:Textitem")
+        self.new_name_textbox.press("Enter")
+        expect(self.kaiwa_text_list).to_contain_text("Video2:Textitem", timeout=WAITING_TIMEOUT_MS)
+        # Add text to Textitem2
+        self.kaiwa_text_msg.last.fill("Verify next chatflow content after clicking video URL button.")
+        self.kaiwa_text_msg.last.press("Enter")
+        # Close popup.
+        self._close_tutorials_popup_if_visible()
+        expect(self.kaiwa_text_msg.last).to_have_value("Verify next chatflow content after clicking video URL button.", timeout=WAITING_TIMEOUT_MS)
+    
     # --- Test Deploy and verify API call ---
     def deploy_and_verify(self):
         """Deploys the application and presses Escape after successful API call."""

@@ -46,6 +46,9 @@ class CreateCarousel:
         self.react_content_dropdown_coupon = page.locator("ul[class='ui-dropdown-opts']").get_by_text("クーポン", exact=True)
         self.react_button_add = page.locator("//section[@class='nodes-pane']")
         self.react_button_name_input = page.locator("input[id='input_bot_btn']")
+        # For textitem for verification
+        self.add_kaiwa_text = page.locator("dd[rt='text']")
+        self.kaiwa_text_msg = page.locator("textarea.msg.with-emoticon")
         # Deploy button and popups
         self.deploy_button = page.get_by_role("button", name="公開する")
         self.deploy_popup = page.locator(".popup:has-text('[公開]すると、以下のfacebook page、またはLINEアカウントに反映されます。')")
@@ -162,6 +165,23 @@ class CreateCarousel:
         self.react_button_name_input.fill(REACTION_CAROUSEL2_NAME)
         self.react_button_name_input.press("Enter")
         expect(self.react_button_add.get_by_text(REACTION_CAROUSEL2_NAME)).to_be_visible(timeout=WAITING_TIMEOUT_MS)
+
+    # --- Create a new text item for verification purpose ---
+    def create_new_textitem_for_verification(self):
+        """Creates a new text item for verification purpose."""
+        # Create Textitem for verification
+        self.add_kaiwa_button.hover()
+        self.add_kaiwa_text.click()
+        expect(self.new_name_textbox).to_be_editable()
+        self.new_name_textbox.fill("Carousel2:Textitem")
+        self.new_name_textbox.press("Enter")
+        expect(self.kaiwa_text_list).to_contain_text("Carousel2:Textitem", timeout=WAITING_TIMEOUT_MS)
+        # Add text to Textitem for verification
+        self.kaiwa_text_msg.last.fill("Verify next chatflow content after selecting coupon in carousel2.")
+        self.kaiwa_text_msg.last.press("Enter")
+        # Close popup.
+        self._close_tutorials_popup_if_visible()
+        expect(self.kaiwa_text_msg.last).to_have_value("Verify next chatflow content after selecting coupon in carousel2.", timeout=WAITING_TIMEOUT_MS)
 
     # --- Test Deploy and verify API call ---
     def deploy_and_verify(self):

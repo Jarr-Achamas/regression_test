@@ -186,9 +186,12 @@ def test_chatflow_carousel(logged_in_chatflow_page: Page):
         (create_chat_carousel.setting_reaction_carousel2,
          "[6] Set reaction for carousel2.",
          "[6] FAILED to set reaction for carousel2."),
+        (create_chat_carousel.create_new_textitem_for_verification,
+         "[7] Created a new text item for verification purpose.",
+         "[7] FAILED to create a new text item for verification purpose."),
         (create_chat_carousel.deploy_and_verify,
-         "[7] Deployed the chatflow successfully.",
-         "[7] FAILED to deploy the chatflow."),
+         "[8] Deployed the chatflow successfully.",
+         "[8] FAILED to deploy the chatflow."),
     ]
 
     for step_func, success_msg, failure_msg in test_steps:
@@ -238,9 +241,12 @@ def test_chatflow_image_carousel_map(logged_in_chatflow_page: Page, image_path_f
         (create_image_carousel.setting_reaction_imagemap,
          "[6] Set reaction for イメージマップ.",
          "[6] FAILED to Set reaction for イメージマップ."),
+        (create_image_carousel.create_new_textitem_for_verification,
+         "[7] Created a new text item for verification purpose.",
+         "[7] FAILED to create a new text item for verification purpose."),
         (create_image_carousel.deploy_and_verify,
-         "[7] Deployed the chatflow successfully.",
-         "[7] FAILED to deploy the chatflow."),
+         "[8] Deployed the chatflow successfully.",
+         "[8] FAILED to deploy the chatflow."),
     ]
 
     for step_func, success_msg, failure_msg in test_steps:
@@ -286,9 +292,12 @@ def test_chatflow_image_video(logged_in_chatflow_page: Page, image_path_factory:
         (lambda: create_image_video.add_video_url_to_video_item(image_path=image_item_path),
          "[5] Set video URL for Video item.",
          "[5] FAILED to set video URL for Video item."),
+        (create_image_video.create_new_textitem_for_verification,
+         "[6] Created a new text item for verification purpose.",
+         "[6] FAILED to create a new text item for verification purpose."),
         (create_image_video.deploy_and_verify,
-         "[6] Deployed the chatflow successfully.",
-         "[6] FAILED to deploy the chatflow."),
+         "[7] Deployed the chatflow successfully.",
+         "[7] FAILED to deploy the chatflow."),
     ]
 
     for step_func, success_msg, failure_msg in test_steps:

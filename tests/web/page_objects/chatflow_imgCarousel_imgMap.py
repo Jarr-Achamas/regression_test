@@ -53,7 +53,6 @@ class CreateImageCarouselMap:
         # For textitem reaction setting
         self.add_kaiwa_text = page.locator("dd[rt='text']")
         self.kaiwa_text_msg = page.locator("textarea.msg.with-emoticon")
-        self.close_txt_popup_button = page.locator("section[class='popover right vars'].icon.close")
         self.add_kaiwa_carousel = page.locator("dd[rt='card']")
         # Deploy button and popups
         self.deploy_button = page.get_by_role("button", name="公開する")
@@ -140,7 +139,6 @@ class CreateImageCarouselMap:
             # Add text to Textitem1
             self.kaiwa_text_msg.last.fill(CHAT_FLOW_TEXT_ITEMS[4])
             self.kaiwa_text_msg.last.press("Enter")
-            # self.close_txt_popup_button.click()
             # Close popup.
             self._close_tutorials_popup_if_visible()
             expect(self.kaiwa_text_msg.last).to_have_value(CHAT_FLOW_TEXT_ITEMS[4])
@@ -299,6 +297,23 @@ class CreateImageCarouselMap:
         # expect(self.image_map_react_popup).to_be_visible(timeout=WAITING_TIMEOUT_MS)
 
         expect(self.icon_signout).to_have_count(2)
+
+    # --- Create new text item for verification purpose ---
+    def create_new_textitem_for_verification(self):
+        """Creates a new text item for verification purpose."""
+        # Create Textitem2 under Group3
+        self.add_kaiwa_button.hover()
+        self.add_kaiwa_text.click()
+        expect(self.new_name_textbox).to_be_editable()
+        self.new_name_textbox.fill("Area3:Textitem")
+        self.new_name_textbox.press("Enter")
+        expect(self.kaiwa_text_list).to_contain_text("Area3:Textitem", timeout=WAITING_TIMEOUT_MS)
+        # Add text to Textitem2
+        self.kaiwa_text_msg.last.fill("Verify next chatflow content from Image Map Area 3.")
+        self.kaiwa_text_msg.last.press("Enter")
+        # Close popup.
+        self._close_tutorials_popup_if_visible()
+        expect(self.kaiwa_text_msg.last).to_have_value("Verify next chatflow content from Image Map Area 3.", timeout=WAITING_TIMEOUT_MS)
 
     # --- Test Deploy and verify API call ---
     def deploy_and_verify(self):
