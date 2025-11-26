@@ -67,4 +67,9 @@ REACTION_IMGCAROUSEL_BTN_NAME = "IMG_ボタン"
 # Chat flow - 画像＆動画 flow
 GROUP_NAME_IMGnVDO = "Group4"
 IMAGE_ITEM_NAME = "image1"
-VIDEO_ITEM_NAME = "video1"
+VIDEO_ITEM_NAME = [
+    "video1",
+    "video2"
+]
+VIDEO_LINK_URL = "https://www.w3schools.com/html/mov_bbb.mp4"
+

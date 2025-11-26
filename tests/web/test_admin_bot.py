@@ -256,7 +256,6 @@ def test_chatflow_image_carousel_map(logged_in_chatflow_page: Page, image_path_f
             logger.error(f"--- Unexpected Error Details ---\n{e}\n---------------------------------")
             raise  # IMPORTANT: Always re-raise the exception
 
-
 def test_chatflow_image_video(logged_in_chatflow_page: Page, image_path_factory: Callable[..., str]):
     """
     Test creating a new 画像＆動画 flow and all related reaction.
@@ -281,12 +280,15 @@ def test_chatflow_image_video(logged_in_chatflow_page: Page, image_path_factory:
         (lambda: create_image_video.add_image_to_image_item(image_path=image_item_path),
          "[3] Set reaction for Image item.",
          "[3] FAILED to set reaction for Image item."),
-        # (lambda: create_image_video.add_video_to_video_item(video_path=video_item_path),
-        #  "[4] Set reaction for Video item.",
-        #  "[4] FAILED to set reaction for Video item."),
-        # (create_image_video.deploy_and_verify,
-        #  "[5] Deployed the chatflow successfully.",
-        #  "[5] FAILED to deploy the chatflow."),
+        (lambda: create_image_video.add_video_to_video_item(video_path=video_item_path, image_path=image_item_path),
+         "[4] Set reaction for Video item.",
+         "[4] FAILED to set reaction for Video item."),
+        (lambda: create_image_video.add_video_url_to_video_item(image_path=image_item_path),
+         "[5] Set video URL for Video item.",
+         "[5] FAILED to set video URL for Video item."),
+        (create_image_video.deploy_and_verify,
+         "[6] Deployed the chatflow successfully.",
+         "[6] FAILED to deploy the chatflow."),
     ]
 
     for step_func, success_msg, failure_msg in test_steps:
