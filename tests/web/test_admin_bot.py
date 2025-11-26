@@ -51,6 +51,7 @@ def test_clear_previous_created_data(logged_in_chatflow_page: Page):
 
 
 @pytest.mark.chatflow
+@pytest.mark.textitem
 def test_chatflow_kaiwa(logged_in_chatflow_page: Page):
     """
     Test creating a new 会話 flow and all related reaction.
@@ -323,6 +324,8 @@ def test_chatflow_image_video(logged_in_chatflow_page: Page, image_path_factory:
             logger.error(f"--- Unexpected Error Details ---\n{e}\n---------------------------------")
             raise  # IMPORTANT: Always re-raise the exception
 
+@pytest.mark.chatflow
+@pytest.mark.condition_item
 def test_chatflow_condition_item(logged_in_chatflow_page: Page):
     """
     Test creating a new 条件式 flow and all related reaction.
