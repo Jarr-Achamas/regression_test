@@ -73,3 +73,9 @@ VIDEO_ITEM_NAME = [
 ]
 VIDEO_LINK_URL = "https://www.w3schools.com/html/mov_bbb.mp4"
 
+# Chat flow - 条件式 flow
+GROUP_NAME_CONDITION = "Group5"
+CONDITION_ITEM_NAME = "condition1"
+CONDITION_VALUE = "{{user.choice}}=choice1"
+REACTION_TEXTITEM1_ACT = "1:Textitem1"
+REACTION_CAROUSEL2_ACT = "2:carousel2"

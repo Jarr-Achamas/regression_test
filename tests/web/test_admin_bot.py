@@ -5,7 +5,7 @@ from playwright.sync_api import Page, Error as PlaywrightError
 from datetime import datetime, date, time, timedelta
 from page_objects import (
     ChatflowPage, CheckClearData, CreateChat, CreateCarousel, CouponFunction, 
-    CreateImageCarouselMap, CreateImageVideo
+    CreateImageCarouselMap, CreateImageVideo, CreateConditionItem
     )
 
 # Configure logging
@@ -291,6 +291,43 @@ def test_chatflow_image_video(logged_in_chatflow_page: Page, image_path_factory:
          "[6] FAILED to deploy the chatflow."),
     ]
 
+    for step_func, success_msg, failure_msg in test_steps:
+        try:
+            step_func()
+            logger.info(f"Test PASSED: {success_msg}")
+        except PlaywrightError as e:  # Catching specific Playwright errors is good practice
+            logger.error(f"Test FAILED: {failure_msg}")
+            logger.error(f"--- Playwright Error Details ---\n{e}\n-------------------------------")
+            raise  # Re-raise the exception to make sure Pytest marks the test as failed
+        except Exception as e:  # Catch any other unexpected errors
+            logger.error(f"Test FAILED: {failure_msg}")
+            logger.error(f"--- Unexpected Error Details ---\n{e}\n---------------------------------")
+            raise  # IMPORTANT: Always re-raise the exception
+
+def test_chatflow_condition_item(logged_in_chatflow_page: Page):
+    """
+    Test creating a new 条件式 flow and all related reaction.
+    -  Create a new Group5.
+     - Create a new Condition item.
+     - 
+    - Deploy and verify.
+    """
+    logger.info("--- Starting test: Test creating a new 条件式 flow and all related reaction. ---")
+    create_condition_item = CreateConditionItem(logged_in_chatflow_page)
+    test_steps = [
+        (create_condition_item.create_new_chat_group,
+         "[1] Created a new Group5.",
+         "[1] FAILED to create a new Group5."),
+        (create_condition_item.create_condition_item,
+         "[2] Created new 条件式 item.",
+         "[2] FAILED to create new 条件式 item."),
+        (create_condition_item.setting_condition_item,
+         "[3] Set condition for 条件式 item.",
+         "[3] FAILED to set condition for 条件式 item."),
+        (create_condition_item.deploy_and_verify,
+         "[4] Deployed the chatflow successfully.",
+         "[4] FAILED to deploy the chatflow."),
+    ]
     for step_func, success_msg, failure_msg in test_steps:
         try:
             step_func()

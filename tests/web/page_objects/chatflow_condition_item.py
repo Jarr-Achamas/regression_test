@@ -5,6 +5,8 @@ from config import WAITING_TIMEOUT_MS
 from tests.web.test_data import (
     GROUP_NAME_KAIWA, GROUP_NAME_CAROUSEL, CHAT_FLOW_TEXT_ITEMS, CHAT_FLOW_CAROUSEL_NAME,
     GROUP_NAME_CONDITION, CONDITION_ITEM_NAME, CONDITION_VALUE,
+    REACTION_TEXTITEM1_ACT, REACTION_CAROUSEL2_ACT,
+    APP_JSON_DEPLOY_API
     )
  
 class CreateConditionItem:
@@ -33,8 +35,16 @@ class CreateConditionItem:
         # Condition item setting
         self.moshi_dropdown = page.locator("div[class='ui-dropdown']").first
         self.moshi_dropdown_options = page.locator("ul[class='ui-dropdown-opts']")
-        self.condition_input = page.locator(".condition-box input[name='condition']")
-        
+        self.moshi_condition_input = page.locator(".condition-box input[name='condition']")
+        self.then_condition_input = page.locator("input[target_name='then']")
+        self.else_condition_input = page.locator("input[target_name='else']")
+        self.condition_selected = page.locator("span[class='autocomplete-select tooltip fixed']")
+        self.condition_ul = page.locator("ul#form-item-autocomplete")
+        # Deploy button and popups
+        self.deploy_button = page.get_by_role("button", name="公開する")
+        self.deploy_popup = page.locator(".popup:has-text('[公開]すると、以下のfacebook page、またはLINEアカウントに反映されます。')")
+        self.deploy_ok_button = self.deploy_popup.get_by_role("button", name="OK")
+        self.deploy_complete_popup = page.locator(".popup:has-text('デプロイが完了しました！')")
     # ==================================================================
 
 
@@ -143,6 +153,31 @@ class CreateConditionItem:
         self.moshi_dropdown.click() # Open もし dropdown
         self.moshi_dropdown_options.get_by_text("User key").click() # Select User key
         expect(self.moshi_dropdown).to_have_text("User key", timeout=WAITING_TIMEOUT_MS)
-        self.condition_input.click()
-        self.condition_input.fill(CONDITION_VALUE) # Input condition value
-        self.condition_input.press("Enter")
+        self.moshi_condition_input.click() # Input condition value
+        self.moshi_condition_input.fill(CONDITION_VALUE) 
+        self.moshi_condition_input.press("Enter")
+        expect(self.moshi_condition_input).to_have_value(CONDITION_VALUE, timeout=WAITING_TIMEOUT_MS)
+        # Setting reaction for then and else
+        self.then_condition_input.fill(REACTION_TEXTITEM1_ACT)
+        self.condition_ul.get_by_text(REACTION_TEXTITEM1_ACT).last.click()
+        expect(self.condition_selected.nth(0).get_by_text(REACTION_TEXTITEM1_ACT)).to_be_visible(timeout=WAITING_TIMEOUT_MS)
+        self.else_condition_input.fill(REACTION_CAROUSEL2_ACT)
+        self.else_condition_input.press("Enter")
+        self.else_condition_input.press_sequentially(" ")
+        self.condition_ul.get_by_text(REACTION_CAROUSEL2_ACT).last.click()
+        expect(self.condition_selected.nth(1).get_by_text(REACTION_CAROUSEL2_ACT)).to_be_visible(timeout=WAITING_TIMEOUT_MS)
+
+    # --- Test Deploy and verify API call ---
+    def deploy_and_verify(self):
+        """Deploys the application and presses Escape after successful API call."""
+        # Call the reusable helper function
+        deploy_and_wait_for_response(
+            page=self.page,
+            deploy_button=self.deploy_button,
+            deploy_popup=self.deploy_popup,
+            ok_button=self.deploy_ok_button,
+            deploy_complete_popup=self.deploy_complete_popup,
+            url_glob=APP_JSON_DEPLOY_API
+        )
+        # If the helper function completes without error, press "Escape"
+        # self.page.keyboard.press("Escape")
