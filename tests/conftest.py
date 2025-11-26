@@ -22,6 +22,20 @@ def pytest_addoption(parser):
         "--api-version", action="store", default="2.0", help="Specify the API version to test: 1.0 or 2.0"
     )
 
+# --- Test Collection Hook: Ensure setup tests run first ---
+def pytest_collection_modifyitems(config, items):
+    """Reorder tests so setup-marked tests run before all others."""
+    setup_tests = []
+    other_tests = []
+    
+    for item in items:
+        if item.get_closest_marker("setup"):
+            setup_tests.append(item)
+        else:
+            other_tests.append(item)
+    
+    items[:] = setup_tests + other_tests
+
 # --- Session-Scoped Fixtures ---
 # These are set up once for the entire test run for efficiency.
 @pytest.fixture(scope="session")
