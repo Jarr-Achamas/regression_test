@@ -57,7 +57,7 @@ class CouponFunction:
     # Reusable Helper Methods
     # ==================================================================
     # --- Get existing coupon row ---
-    def get_coupon_data_row_count(self) -> int:
+    def _get_coupon_data_row_count(self) -> int:
         """
         Counts only the data rows in the coupon list, ignoring the header.
         Returns 0 if the table is empty.
@@ -65,7 +65,7 @@ class CouponFunction:
         return self.coupon_data_rows.count()
 
     # --- Create new coupon function ---
-    def create_new_coupon(self, name: str, segment: str = None, end_datetime: str = None, description: str = None, image_path: str = None):
+    def _create_new_coupon(self, name: str, segment: str = None, end_datetime: str = None, description: str = None, image_path: str = None):
         """Creates a new coupon with the provided details."""
         self.coupon_create_button.click()
         expect(self.coupon_create_popup).to_be_visible()
@@ -85,9 +85,9 @@ class CouponFunction:
         expect(self.coupon_create_popup).not_to_be_visible()
 
     # --- Delete all coupons ---
-    def delete_all_coupons(self):
+    def _delete_all_coupons	(self):
         """Helper method to delete all coupons from the list."""
-        while self.get_coupon_data_row_count() > 0:
+        while self._get_coupon_data_row_count() > 0:
             # Always delete the first coupon in the list
             self.coupon_delete_icon.click()
             expect(self.coupon_delete_popup).to_be_visible(timeout=WAITING_TIMEOUT_MS)
@@ -122,12 +122,12 @@ class CouponFunction:
         self.three_dots_popup.get_by_text("クーポン").click()
         expect(self.coupon_create_button).to_be_visible(timeout=WAITING_TIMEOUT_MS)
         # Delete all coupon before start the test
-        self.delete_all_coupons()
+        self._delete_all_coupons	()
 
     # --- Test create new coupon1 ---
     def create_new_coupon1(self, end_date: str, end_datetime: str, image_path: str):
         """Creates a new coupon."""
-        self.create_new_coupon(COUPON_NAME1, CP_SEGMENT_NAME, end_datetime, COUPON_DESCRIPTION, image_path)
+        self._create_new_coupon(COUPON_NAME1, CP_SEGMENT_NAME, end_datetime, COUPON_DESCRIPTION, image_path)
         expect(self.coupon_list_view_first).to_contain_text(COUPON_NAME1, timeout=WAITING_TIMEOUT_MS)
         expect(self.coupon_list_view_first).to_contain_text(CP_SEGMENT_NAME, timeout=WAITING_TIMEOUT_MS)
         expect(self.coupon_list_view_first).to_contain_text(end_date, timeout=WAITING_TIMEOUT_MS)
@@ -157,7 +157,7 @@ class CouponFunction:
     # --- Test delete sent coupon ---
     def delete_sent_coupon(self):
         """Verify that able to delete sent coupon."""
-        initial_coupon_count = self.get_coupon_data_row_count() # Get the initial count
+        initial_coupon_count = self._get_coupon_data_row_count() # Get the initial count
         # Perform the delete action
         self.coupon_delete_icon.click()
         expect(self.coupon_delete_popup).to_be_visible(timeout=WAITING_TIMEOUT_MS)
@@ -171,8 +171,8 @@ class CouponFunction:
     # --- Test delete unsent coupon ---
     def delete_unsent_coupon(self):
         """Verify that able to delete unsent coupon."""
-        self.create_new_coupon(COUPON_NAME2)
-        initial_coupon_count = self.get_coupon_data_row_count() # Get the initial count
+        self._create_new_coupon(COUPON_NAME2)
+        initial_coupon_count = self._get_coupon_data_row_count() # Get the initial count
         # Perform the delete action
         self.coupon_delete_icon.click()
         expect(self.coupon_delete_popup).to_be_visible(timeout=WAITING_TIMEOUT_MS)
@@ -186,8 +186,8 @@ class CouponFunction:
     # --- Test search coupon ---
     def search_coupon(self):
         """Verify search for a coupon."""
-        self.create_new_coupon(COUPON_NAME2)
-        self.create_new_coupon(COUPON_NAME3)
+        self._create_new_coupon(COUPON_NAME2)
+        self._create_new_coupon(COUPON_NAME3)
         # Perform search action
         self.coupon_search_input.fill(COUPON_NAME2)
         self.coupon_search_input.press("Enter")

@@ -3,7 +3,7 @@ from playwright.sync_api import Page, expect, Locator
 from tests.web.utils.network_helpers import deploy_and_wait_for_response
 from config import WAITING_TIMEOUT_MS
 from tests.web.test_data import (
-    GROUP_NAME_IMAGECAROUSEL, IMAGE_CAROUSEL_NAME, IMAGE_MAP_NAME, REACTION_CAROUSEL1_API, 
+    GROUP_NAME_IMAGECAROUSEL, IMAGE_CAROUSEL_NAME, IMAGE_MAP_NAME, 
     REACTION_IMGCAROUSEL_API, REACTION_IMGCAROUSEL_BTN_NAME, 
     GROUP_NAME_KAIWA, CHAT_FLOW_TEXT_ITEMS, GROUP_NAME_CAROUSEL, CHAT_FLOW_CAROUSEL_NAME,
     APP_JSON_DEPLOY_API
@@ -53,7 +53,6 @@ class CreateImageCarouselMap:
         # For textitem reaction setting
         self.add_kaiwa_text = page.locator("dd[rt='text']")
         self.kaiwa_text_msg = page.locator("textarea.msg.with-emoticon")
-        self.close_txt_popup_button = page.locator("section[class='popover right vars'].icon.close")
         self.add_kaiwa_carousel = page.locator("dd[rt='card']")
         # Deploy button and popups
         self.deploy_button = page.get_by_role("button", name="公開する")
@@ -140,7 +139,6 @@ class CreateImageCarouselMap:
             # Add text to Textitem1
             self.kaiwa_text_msg.last.fill(CHAT_FLOW_TEXT_ITEMS[4])
             self.kaiwa_text_msg.last.press("Enter")
-            # self.close_txt_popup_button.click()
             # Close popup.
             self._close_tutorials_popup_if_visible()
             expect(self.kaiwa_text_msg.last).to_have_value(CHAT_FLOW_TEXT_ITEMS[4])
@@ -255,15 +253,13 @@ class CreateImageCarouselMap:
         """Sets the reaction for the image map by uploading an image."""
         # Upload image for image map
         self._upload_image_map(image_path=image_path)
-        # Setting reaction for image
+        # Setting reaction for image map
         self.image_map_brush_icon.click()
         expect(self.image_map_image_area).to_be_visible(timeout=WAITING_TIMEOUT_MS)
-        # Draw areas on image
-        # Get the position and size of the element
-        image_area_box = self.image_area.bounding_box()
+        image_area_box = self.image_area.bounding_box() # Draw areas on image
         assert image_area_box is not None, "Image area bounding box is None"
-        start_x = image_area_box["x"]
-        start_y = image_area_box["y"]
+        start_x = image_area_box["x"] # Get the position and size of the element
+        start_y = image_area_box["y"] # Get the position and size of the element
         # Draw Area 1
         self._draw_area_on_image(start_x, start_y, start_x + 233, start_y + 485, "Area 1")
         # Draw Area 2
@@ -301,6 +297,23 @@ class CreateImageCarouselMap:
         # expect(self.image_map_react_popup).to_be_visible(timeout=WAITING_TIMEOUT_MS)
 
         expect(self.icon_signout).to_have_count(2)
+
+    # --- Create new text item for verification purpose ---
+    def create_new_textitem_for_verification(self):
+        """Creates a new text item for verification purpose."""
+        # Create Textitem2 under Group3
+        self.add_kaiwa_button.hover()
+        self.add_kaiwa_text.click()
+        expect(self.new_name_textbox).to_be_editable()
+        self.new_name_textbox.fill("Area3:Textitem")
+        self.new_name_textbox.press("Enter")
+        expect(self.kaiwa_text_list).to_contain_text("Area3:Textitem", timeout=WAITING_TIMEOUT_MS)
+        # Add text to Textitem2
+        self.kaiwa_text_msg.last.fill("Verify next chatflow content from Image Map Area 3.")
+        self.kaiwa_text_msg.last.press("Enter")
+        # Close popup.
+        self._close_tutorials_popup_if_visible()
+        expect(self.kaiwa_text_msg.last).to_have_value("Verify next chatflow content from Image Map Area 3.", timeout=WAITING_TIMEOUT_MS)
 
     # --- Test Deploy and verify API call ---
     def deploy_and_verify(self):

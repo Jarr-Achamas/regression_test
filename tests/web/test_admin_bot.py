@@ -5,7 +5,7 @@ from playwright.sync_api import Page, Error as PlaywrightError
 from datetime import datetime, date, time, timedelta
 from page_objects import (
     ChatflowPage, CheckClearData, CreateChat, CreateCarousel, CouponFunction, 
-    CreateImageCarouselMap, CreateImageVideo
+    CreateImageCarouselMap, CreateImageVideo, CreateConditionItem
     )
 
 # Configure logging
@@ -191,9 +191,12 @@ def test_chatflow_carousel(logged_in_chatflow_page: Page):
         (create_chat_carousel.setting_reaction_carousel2,
          "[6] Set reaction for carousel2.",
          "[6] FAILED to set reaction for carousel2."),
+        (create_chat_carousel.create_new_textitem_for_verification,
+         "[7] Created a new text item for verification purpose.",
+         "[7] FAILED to create a new text item for verification purpose."),
         (create_chat_carousel.deploy_and_verify,
-         "[7] Deployed the chatflow successfully.",
-         "[7] FAILED to deploy the chatflow."),
+         "[8] Deployed the chatflow successfully.",
+         "[8] FAILED to deploy the chatflow."),
     ]
 
     for step_func, success_msg, failure_msg in test_steps:
@@ -245,9 +248,12 @@ def test_chatflow_image_carousel_map(logged_in_chatflow_page: Page, image_path_f
         (create_image_carousel.setting_reaction_imagemap,
          "[6] Set reaction for イメージマップ.",
          "[6] FAILED to Set reaction for イメージマップ."),
+        (create_image_carousel.create_new_textitem_for_verification,
+         "[7] Created a new text item for verification purpose.",
+         "[7] FAILED to create a new text item for verification purpose."),
         (create_image_carousel.deploy_and_verify,
-         "[7] Deployed the chatflow successfully.",
-         "[7] FAILED to deploy the chatflow."),
+         "[8] Deployed the chatflow successfully.",
+         "[8] FAILED to deploy the chatflow."),
     ]
 
     for step_func, success_msg, failure_msg in test_steps:
@@ -290,14 +296,57 @@ def test_chatflow_image_video(logged_in_chatflow_page: Page, image_path_factory:
         (lambda: create_image_video.add_image_to_image_item(image_path=image_item_path),
          "[3] Set reaction for Image item.",
          "[3] FAILED to set reaction for Image item."),
-        # (lambda: create_image_video.add_video_to_video_item(video_path=video_item_path),
-        #  "[4] Set reaction for Video item.",
-        #  "[4] FAILED to set reaction for Video item."),
-        # (create_image_video.deploy_and_verify,
-        #  "[5] Deployed the chatflow successfully.",
-        #  "[5] FAILED to deploy the chatflow."),
+        (lambda: create_image_video.add_video_to_video_item(video_path=video_item_path, image_path=image_item_path),
+         "[4] Set reaction for Video item.",
+         "[4] FAILED to set reaction for Video item."),
+        (lambda: create_image_video.add_video_url_to_video_item(image_path=image_item_path),
+         "[5] Set video URL for Video item.",
+         "[5] FAILED to set video URL for Video item."),
+        (create_image_video.create_new_textitem_for_verification,
+         "[6] Created a new text item for verification purpose.",
+         "[6] FAILED to create a new text item for verification purpose."),
+        (create_image_video.deploy_and_verify,
+         "[7] Deployed the chatflow successfully.",
+         "[7] FAILED to deploy the chatflow."),
     ]
 
+    for step_func, success_msg, failure_msg in test_steps:
+        try:
+            step_func()
+            logger.info(f"Test PASSED: {success_msg}")
+        except PlaywrightError as e:  # Catching specific Playwright errors is good practice
+            logger.error(f"Test FAILED: {failure_msg}")
+            logger.error(f"--- Playwright Error Details ---\n{e}\n-------------------------------")
+            raise  # Re-raise the exception to make sure Pytest marks the test as failed
+        except Exception as e:  # Catch any other unexpected errors
+            logger.error(f"Test FAILED: {failure_msg}")
+            logger.error(f"--- Unexpected Error Details ---\n{e}\n---------------------------------")
+            raise  # IMPORTANT: Always re-raise the exception
+
+def test_chatflow_condition_item(logged_in_chatflow_page: Page):
+    """
+    Test creating a new 条件式 flow and all related reaction.
+    -  Create a new Group5.
+     - Create a new Condition item.
+     - 
+    - Deploy and verify.
+    """
+    logger.info("--- Starting test: Test creating a new 条件式 flow and all related reaction. ---")
+    create_condition_item = CreateConditionItem(logged_in_chatflow_page)
+    test_steps = [
+        (create_condition_item.create_new_chat_group,
+         "[1] Created a new Group5.",
+         "[1] FAILED to create a new Group5."),
+        (create_condition_item.create_condition_item,
+         "[2] Created new 条件式 item.",
+         "[2] FAILED to create new 条件式 item."),
+        (create_condition_item.setting_condition_item,
+         "[3] Set condition for 条件式 item.",
+         "[3] FAILED to set condition for 条件式 item."),
+        (create_condition_item.deploy_and_verify,
+         "[4] Deployed the chatflow successfully.",
+         "[4] FAILED to deploy the chatflow."),
+    ]
     for step_func, success_msg, failure_msg in test_steps:
         try:
             step_func()
