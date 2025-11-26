@@ -1,9 +1,9 @@
-# page_objects/chatflow_create_image_video.py
+# page_objects/chatflow_image_and_video.py
 from playwright.sync_api import Page, expect, Locator
 from tests.web.utils.network_helpers import deploy_and_wait_for_response
 from config import WAITING_TIMEOUT_MS
 from tests.web.test_data import (
-    GROUP_NAME_IMGnVDO, IMAGE_ITEM_NAME, VIDEO_ITEM_NAME,
+    GROUP_NAME_IMGnVDO, IMAGE_ITEM_NAME, VIDEO_ITEM_NAME, VIDEO_LINK_URL,
     APP_JSON_DEPLOY_API
     )
 
@@ -26,15 +26,23 @@ class CreateImageVideo:
         self.kaiwa_text_list = page.locator(".actions")
         # For upload image item
         self.react_content_cards = page.locator("div[class='cells-frame rt-card rt-imagecard rt-image rt-video rt-audio rt-imagemap rt-flyer rt-flex']")
-        # self.image_item_card = self.react_content_cards.first.locator("> ol")
-        self.image_item_upload_icon = self.react_content_cards.first.locator("i[class='icon camera large upload-btn']")
-        self.image_item_preview = self.react_content_cards.first.locator("li.data.imagecard")
+        self.image_item_upload_icon = self.react_content_cards.nth(0).locator("i[class='icon camera large upload-btn']")
+        self.image_item_preview = self.react_content_cards.nth(0).locator("li.data.imagecard")
         # Reaction for image item
         self.react_button_add = page.locator("section[class='nodes-pane']")
         self.react_button_name_input = page.locator("input[id='input_bot_btn']")
-        # For upload video item
-        self.video_item_upload_icon = self.react_content_cards.last.locator("i[class='icon video large upload-btn left_b']")
-        self.video_item_preview = self.react_content_cards.last.locator("li.data.imagecard")
+        # For upload video by file
+        self.video_item_upload_icon = self.react_content_cards.nth(1).locator("i[class='icon video large upload-btn left_b']")
+        self.video_tumbnail_upload_icon1 = self.react_content_cards.nth(1).locator("i[class='icon camera large upload-btn left_t']")
+        # For upload video by URL
+        self.video_item_upload_url = self.react_content_cards.nth(2).locator("i[class='icon link large upload-btn']")
+        self.video_item_url_input = self.react_content_cards.nth(2).get_by_placeholder("MP4動画のURL入力")
+        self.video_tumbnail_upload_icon2 = self.react_content_cards.nth(2).locator("i[class='icon camera large upload-btn left_t']")
+        # Deploy button and popups
+        self.deploy_button = page.get_by_role("button", name="公開する")
+        self.deploy_popup = page.locator(".popup:has-text('[公開]すると、以下のfacebook page、またはLINEアカウントに反映されます。')")
+        self.deploy_ok_button = self.deploy_popup.get_by_role("button", name="OK")
+        self.deploy_complete_popup = page.locator(".popup:has-text('デプロイが完了しました！')")
 
     # ==================================================================
         
@@ -81,26 +89,21 @@ class CreateImageVideo:
     
     
     # --- Reusable Helper Methods for Image Map ---
-    def _upload_image_item(self, item_type: str, image_path: str):
+    def _upload_image_item(self, item_type: str, image_path: str, upload_locator: Locator = None):
         """Helper to upload an image from file."""
-        if item_type == "image":
-            self._upload_image_with_api_wait(
-            trigger_locator=self.image_item_upload_icon,
+        self._upload_image_with_api_wait(
+            trigger_locator=upload_locator,
             image_path=image_path,
-            api_url_glob="**/api/bot/action"
+            api_url_glob="**/api/bot/action"    
         )
-        elif item_type == "video":
-            self._upload_image_with_api_wait(
-                trigger_locator=self.video_item_upload_icon,
-                image_path=image_path,
-                api_url_glob="**/api/bot/action"
+        if item_type == "image":
+            expect(self.image_item_preview).not_to_have_attribute(
+            "style", "background-image: url(\"/images/bg_cam_1.jpg\");"
             )
+        elif item_type == "video":
+            pass
         else:
             raise ValueError(f"Unsupported item_type: {item_type}")
-        # Final verification that the UI updated
-        expect(self.image_item_preview).not_to_have_attribute(
-            "style", "background-image: url(\"/images/bg_cam_1.jpg\");"
-        )
 
 
 
@@ -125,29 +128,67 @@ class CreateImageVideo:
         """Creates an Image item in Group4."""
         # Select Group4
         self.group_list.get_by_text(GROUP_NAME_IMGnVDO, exact=True).click()
-        # Add Image item
-        self._add_kaiwa_item("image", IMAGE_ITEM_NAME)
-        # Add Video item
-        self._add_kaiwa_item("video", VIDEO_ITEM_NAME)
+        self._add_kaiwa_item("image", IMAGE_ITEM_NAME)    # Add Image item
+        self._add_kaiwa_item("video", VIDEO_ITEM_NAME[0]) # Add Video item
+        self._add_kaiwa_item("video", VIDEO_ITEM_NAME[1]) # Add Video item
 
-    # --- Test add Image to 画像 item ---
+    # --- Test add Image to 画像 item --- 
     def add_image_to_image_item(self, image_path: str):
         """Adds an image to the Image item."""
-        # Upload image for image item
+        # Upload image file for image item
         self.kaiwa_text_list.get_by_text(IMAGE_ITEM_NAME).click()
-        self._upload_image_item("image", image_path=image_path)
+        self._upload_image_item("image", image_path=image_path, upload_locator=self.image_item_upload_icon)
         # Set reaction for image item
         self.react_button_add.get_by_text("選択式ボタンを追加").nth(0).click()
         self.react_button_name_input.fill("画像ボタン")
         self.react_button_name_input.press("Enter")
 
-    # --- Test add Video to 動画 item ---
-    def add_video_to_video_item(self, video_path: str):
+    # --- Test add Video to 動画 item .mp4 ---
+    def add_video_to_video_item(self, video_path: str, image_path: str):
         """Adds a video to the Video item."""
-        # Upload video for video item
-        self.kaiwa_text_list.get_by_text(VIDEO_ITEM_NAME).click()
-        self._upload_image_item("video", image_path=video_path)
+        # Upload video file for video item
+        self.kaiwa_text_list.get_by_text(VIDEO_ITEM_NAME[0]).click()
+        self._upload_image_item("video", image_path=video_path, upload_locator=self.video_item_upload_icon)
         # Set reaction for video item
         self.react_button_add.get_by_text("選択式ボタンを追加").nth(1).click()
         self.react_button_name_input.fill("動画ボタン")
         self.react_button_name_input.press("Enter")
+        # Upload thumbnail image for video item
+        self._upload_image_item("image", image_path=image_path, upload_locator=self.video_tumbnail_upload_icon1)
+
+    # --- Test add Video to 動画 item URL ---
+    def add_video_url_to_video_item(self, image_path: str):
+        """Adds a video URL to the Video item."""
+        # Upload video URL for video item
+        self.kaiwa_text_list.get_by_text(VIDEO_ITEM_NAME[1]).click()
+        self.video_item_upload_url.click()
+        self.video_item_url_input.fill(VIDEO_LINK_URL)
+        # Waiting for API response to make sure video URL set successfully
+        api_url_glob = "**/api/bot/action"
+        with self.page.expect_response(api_url_glob, timeout=WAITING_TIMEOUT_MS * 2) as response_info:
+            self.video_item_url_input.press("Enter")
+        response = response_info.value
+        if not response.ok:
+            raise AssertionError(f"Image upload API failed with status {response.status}: {response.text()}")
+        # Set reaction for video item
+        self.react_button_add.get_by_text("選択式ボタンを追加").nth(2).click()
+        self.react_button_name_input.fill("動画URLボタン")
+        self.react_button_name_input.press("Enter")
+        # Upload thumbnail image for video item
+        self._upload_image_item("image", image_path=image_path, upload_locator=self.video_tumbnail_upload_icon2)
+
+    # --- Test Deploy and verify API call ---
+    def deploy_and_verify(self):
+        """Deploys the application and presses Escape after successful API call."""
+        # Call the reusable helper function
+        deploy_and_wait_for_response(
+            page=self.page,
+            deploy_button=self.deploy_button,
+            deploy_popup=self.deploy_popup,
+            ok_button=self.deploy_ok_button,
+            deploy_complete_popup=self.deploy_complete_popup,
+            url_glob=APP_JSON_DEPLOY_API
+        )
+        # If the helper function completes without error, press "Escape"
+        # self.page.keyboard.press("Escape")
+

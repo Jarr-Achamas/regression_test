@@ -1,4 +1,4 @@
-# page_objects/chatflow_create_carousel.py
+# page_objects/chatflow_carousel.py
 from playwright.sync_api import Page, Locator, expect
 from tests.web.utils.network_helpers import deploy_and_wait_for_response
 from config import WAITING_TIMEOUT_MS
@@ -163,7 +163,7 @@ class CreateCarousel:
         self.react_button_name_input.press("Enter")
         expect(self.react_button_add.get_by_text(REACTION_CAROUSEL2_NAME)).to_be_visible(timeout=WAITING_TIMEOUT_MS)
 
-        # --- Test Deploy and verify API call ---
+    # --- Test Deploy and verify API call ---
     def deploy_and_verify(self):
         """Deploys the application and presses Escape after successful API call."""
         # Call the reusable helper function
