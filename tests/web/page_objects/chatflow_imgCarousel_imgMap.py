@@ -255,15 +255,13 @@ class CreateImageCarouselMap:
         """Sets the reaction for the image map by uploading an image."""
         # Upload image for image map
         self._upload_image_map(image_path=image_path)
-        # Setting reaction for image
+        # Setting reaction for image map
         self.image_map_brush_icon.click()
         expect(self.image_map_image_area).to_be_visible(timeout=WAITING_TIMEOUT_MS)
-        # Draw areas on image
-        # Get the position and size of the element
-        image_area_box = self.image_area.bounding_box()
+        image_area_box = self.image_area.bounding_box() # Draw areas on image
         assert image_area_box is not None, "Image area bounding box is None"
-        start_x = image_area_box["x"]
-        start_y = image_area_box["y"]
+        start_x = image_area_box["x"] # Get the position and size of the element
+        start_y = image_area_box["y"] # Get the position and size of the element
         # Draw Area 1
         self._draw_area_on_image(start_x, start_y, start_x + 233, start_y + 485, "Area 1")
         # Draw Area 2
