@@ -1,6 +1,6 @@
 # page_objects/login_page.py
 from playwright.sync_api import Page, expect
-from config import ADMIN_URL, WAITING_TIMEOUT_MS
+from config import WAITING_TIMEOUT_MS
 
 class LoginPage:
     """Page object for the login screen."""

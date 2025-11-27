@@ -79,3 +79,12 @@ CONDITION_ITEM_NAME = "condition1"
 CONDITION_VALUE = "{{user.choice}}=choice1"
 REACTION_TEXTITEM1_ACT = "1:Textitem1"
 REACTION_CAROUSEL2_ACT = "2:carousel2"
+
+# Keyword Mute/Unmute
+KEYWORD_NAME = "keyword1"
+MUTE_KEYWORD = "mutekeyword"
+UNMUTE_KEYWORD = "unmutekeyword"
+KW_GROUP_NAME = "Group6"
+KW_TEXTITEM_NAME = "KW_Textitem1"
+KW_TEXTITEM_MSG = "Hello! This text item is triggered by keyword."
+REACTION_KW_TEXTITEM_ACT = "1:KW_Textitem1"
