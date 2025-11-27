@@ -5,7 +5,8 @@ from playwright.sync_api import Page, Error as PlaywrightError
 from datetime import datetime, date, time, timedelta
 from page_objects import (
     ChatflowPage, CheckClearData, CreateChat, CreateCarousel, CouponFunction, 
-    CreateImageCarouselMap, CreateImageVideo, CreateConditionItem
+    CreateImageCarouselMap, CreateImageVideo, CreateConditionItem,
+    KeywordMuteUnmute
     )
 
 # Configure logging
@@ -27,13 +28,15 @@ def test_clear_previous_created_data(logged_in_chatflow_page: Page):
         (check_clear_data.check_clear_unwanted_groups, 
          "[2] Check and Clear all previous created Groups Chatflow data.", 
          "[2] FAILED to clear Group Chatflow data"),
+        (check_clear_data.check_clear_keyword_mute_unmute, 
+         "[3] Check and Clear all previous created Keyword/Mute/Unmute data.", 
+         "[3] FAILED to clear Keyword/Mute/Unmute data."),
         (check_clear_data.check_clear_unwanted_coupons, 
-         "[3] Check and Clear all previous created Coupons data.", 
-         "[3] FAILED to clear Coupon data."),
+         "[4] Check and Clear all previous created Coupons data.", 
+         "[4] FAILED to clear Coupon data."),
         (check_clear_data.check_clear_unwanted_segment, 
-         "[4] Check and Clear all previous created Segment data.", 
-         "[4] FAILED to clear Segment data."),
-        
+         "[5] Check and Clear all previous created Segment data.", 
+         "[5] FAILED to clear Segment data."),
     ]
 
     for step_func, success_msg, failure_msg in test_steps:
@@ -51,6 +54,7 @@ def test_clear_previous_created_data(logged_in_chatflow_page: Page):
 
 
 @pytest.mark.chatflow
+@pytest.mark.textitem
 def test_chatflow_kaiwa(logged_in_chatflow_page: Page):
     """
     Test creating a new 会話 flow and all related reaction.
@@ -323,6 +327,8 @@ def test_chatflow_image_video(logged_in_chatflow_page: Page, image_path_factory:
             logger.error(f"--- Unexpected Error Details ---\n{e}\n---------------------------------")
             raise  # IMPORTANT: Always re-raise the exception
 
+@pytest.mark.chatflow
+@pytest.mark.condition_item
 def test_chatflow_condition_item(logged_in_chatflow_page: Page):
     """
     Test creating a new 条件式 flow and all related reaction.
@@ -344,6 +350,45 @@ def test_chatflow_condition_item(logged_in_chatflow_page: Page):
          "[3] Set condition for 条件式 item.",
          "[3] FAILED to set condition for 条件式 item."),
         (create_condition_item.deploy_and_verify,
+         "[4] Deployed the chatflow successfully.",
+         "[4] FAILED to deploy the chatflow."),
+    ]
+    for step_func, success_msg, failure_msg in test_steps:
+        try:
+            step_func()
+            logger.info(f"Test PASSED: {success_msg}")
+        except PlaywrightError as e:  # Catching specific Playwright errors is good practice
+            logger.error(f"Test FAILED: {failure_msg}")
+            logger.error(f"--- Playwright Error Details ---\n{e}\n-------------------------------")
+            raise  # Re-raise the exception to make sure Pytest marks the test as failed
+        except Exception as e:  # Catch any other unexpected errors
+            logger.error(f"Test FAILED: {failure_msg}")
+            logger.error(f"--- Unexpected Error Details ---\n{e}\n---------------------------------")
+            raise  # IMPORTANT: Always re-raise the exception
+
+
+@pytest.mark.keyword
+def test_keyword_mute_unmute(logged_in_chatflow_page: Page):
+    """
+    Test creating a new keyword/mute/unmute flow and all related reaction.
+    - Create a new Keyword.
+    - Create a Mute word.
+    - Create a Unmute word.
+    - Deploy and verify.
+    """
+    logger.info("--- Starting test: Test creating a new keyword/mute/unmute flow and all related reaction. ---")
+    keyword_mute_unmute = KeywordMuteUnmute(logged_in_chatflow_page)
+    test_steps = [
+        (keyword_mute_unmute.navigate_to_keyword_mute_unmute_section,
+         "[1] Navigated to Keyword Mute/Unmute section.",
+         "[1] FAILED to navigate to Keyword Mute/Unmute section."),
+        (keyword_mute_unmute.add_new_keyword,
+         "[2] Created new keyword.",
+         "[2] FAILED to create new keyword."),
+        (keyword_mute_unmute.set_mute_unmute_keywords,
+         "[3] Created Mute and Unmute keywords.",
+         "[3] FAILED to create Mute and Unmute keywords."),
+        (keyword_mute_unmute.deploy_and_verify,
          "[4] Deployed the chatflow successfully.",
          "[4] FAILED to deploy the chatflow."),
     ]

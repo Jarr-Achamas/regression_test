@@ -1,5 +1,5 @@
 # page_objects/chatflow_condition_item.py
-from playwright.sync_api import Page, Locator, expect
+from playwright.sync_api import Page, expect
 from tests.web.utils.network_helpers import deploy_and_wait_for_response
 from config import WAITING_TIMEOUT_MS
 from tests.web.test_data import (
