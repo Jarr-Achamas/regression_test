@@ -67,6 +67,42 @@ make test_web_API2.0
 make test_web_API1.0
 ```
 
+### 3. Selective Testing (Filtering) 
+- You can filter tests using the MARKER, SKIP, and PATTERN variables with any of the make commands above.
+
+| Marker | Description |
+| :--- | :--- |
+| `chatflow` | Chatflow creation and editing flow tests |
+| `textitem` | Text item related functionality tests |
+| `coupon` | Coupon functionality tests |
+| `carousel` | Carousel flow tests |
+| `image` | Image and Video related flow tests |
+| `image_carousel_map` | Image Carousels and Image Maps flow tests |
+| `image_video` | Image and Video flow tests |
+| `condition_item` | Condition item related tests |
+| `keyword` | Keyword, Mute, and Unmute related tests |
+| `setup` | Setup/Teardown tests (Runs automatically by default) |
+
+- Usage Examples 
+  - Run only specific tests:
+  ```
+  make test_web_API2.0_headed MARKER=chatflow
+
+  make test_web_API2.0_headed MARKER="coupon or carousel"
+  ```
+  - Skip specific tests:
+  ```
+  make test_web_API2.0_headed MARKER="NOT coupon"
+
+  make test_web_API2.0_headed MARKER="NOT coupon and NOT carousel"
+
+  make test_web_API2.0_headed SKIP=image  
+  ```
+  - Run and Skip only specific tests:
+  ```
+  make test_web_API2.0_headed MARKER="chatflow and NOT carousel"
+  ```
+
 ## 📊 Viewing Reports
 After a test run is complete, you can find the version-specific results in the report/ folder:
 - report/report_api2.html: The HTML report for the API 2.0 test run.
@@ -94,6 +130,7 @@ CHATBOT-TESTS/
 ├── conftest.py             # Pytest fixtures and hooks (setup, teardown, failure handling)
 ├── init_chatbot_tests.py   # Initial setup or utility script
 ├── Makefile                # Command shortcuts for setup and testing
+├── pytest.ini              # Pytest configuration and marker definitions
 ├── README.md               # This file
 ├── requirements.txt        # List of Python dependencies
 └── web_config.py           # Main configuration file (URLs, constants)
